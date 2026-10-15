@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f19" />
+  <meta name="description" content="Xadrez 2026 — tabuleiro 3D jogável com temas, IA e câmera livre." />
+  <title>Xadrez 2026 — Chess 3D Studio</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="canvas-container" aria-label="Tabuleiro de xadrez 3D"></div>
+
+  <div class="top-bar" aria-live="polite">
+    <div class="turn-indicator">
+      <div class="turn-dot" id="turn-dot"></div>
+      <span id="turn-text">Vez das Brancas</span>
+    </div>
+    <div class="status-badge" id="game-status">Em Partida</div>
+  </div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Configurações">
+    <h1>♟️ Xadrez 2026</h1>
+
+    <div class="control-group">
+      <div class="section-title">Tema Geral (Tabuleiro + Peças)</div>
+      <select id="theme-select">
+        <option value="classic">🏛️ Clássico (Staunton Real)</option>
+        <option value="futuristic">🚀 Futurista (Cyberpunk Mecha)</option>
+        <option value="rural">🌾 Rural (Fazenda & Campo)</option>
+        <option value="feminine">👑 Feminino (Realeza & Cristal)</option>
+        <option value="masculine">🛡️ Masculino (Tático Blindado)</option>
+        <option value="cartoon">🎨 Cartoon (Chibi Divertido)</option>
+        <option value="bw">🎬 Preto & Branco (Cinema Noir)</option>
+      </select>
+
+      <label for="piece-style-select" class="with-gap">Estilo dos Personagens (Peças)</label>
+      <select id="piece-style-select">
+        <option value="match">Sincronizar com o Tema Atual</option>
+        <option value="classic">Clássico Padrão</option>
+        <option value="futuristic">Robôs / Mechas Futuristas</option>
+        <option value="rural">Personagens Rurais</option>
+        <option value="feminine">Realeza Elegante</option>
+        <option value="masculine">Armadura Pesada</option>
+        <option value="cartoon">Cartoon Arredondado</option>
+        <option value="bw">Monocromático Noir</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">Modo & Dificuldade da Máquina</div>
+      <select id="game-mode-select">
+        <option value="ai">🤖 Jogador vs. Máquina (IA)</option>
+        <option value="pvp">👥 2 Jogadores (Local)</option>
+      </select>
+
+      <label class="with-gap">Nível da Máquina</label>
+      <div class="btn-grid-3" id="difficulty-btns">
+        <button type="button" data-diff="easy">Fácil</button>
+        <button type="button" data-diff="medium" class="active-btn">Médio</button>
+        <button type="button" data-diff="hard">Hard</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">Posição da Câmera</div>
+      <div class="btn-grid">
+        <button type="button" data-camera="white">Visão Brancas</button>
+        <button type="button" data-camera="black">Visão Pretas</button>
+        <button type="button" data-camera="top">Visão 2D Topo</button>
+        <button type="button" data-camera="iso">Isométrica</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="section-title">Iluminação & Ambiente</div>
+      <div class="btn-grid">
+        <button type="button" data-light="studio">💡 Estúdio</button>
+        <button type="button" data-light="sunset">🌅 Pôr do Sol</button>
+        <button type="button" data-light="neon">🟣 Cyber Neon</button>
+        <button type="button" data-light="dramatic">🌑 Dramática</button>
+      </div>
+
+      <label for="light-dir-intensity" class="with-gap">Intensidade Principal <span id="val-dir">1.4</span></label>
+      <input type="range" id="light-dir-intensity" min="0" max="3" step="0.1" value="1.4" />
+
+      <label for="light-amb-intensity">Luz Ambiente <span id="val-amb">0.6</span></label>
+      <input type="range" id="light-amb-intensity" min="0.1" max="2" step="0.1" value="0.6" />
+
+      <label for="light-pos-x">Ângulo do Sol (X) <span id="val-pos-x">12</span></label>
+      <input type="range" id="light-pos-x" min="-25" max="25" step="1" value="12" />
+
+      <label for="light-pos-z">Ângulo do Sol (Z) <span id="val-pos-z">15</span></label>
+      <input type="range" id="light-pos-z" min="-25" max="25" step="1" value="15" />
+    </div>
+
+    <div class="control-group actions-bottom">
+      <div class="btn-grid">
+        <button type="button" id="undo-btn">↩️ Voltar Lance</button>
+        <button type="button" class="btn-primary" id="reset-btn">🔄 Novo Jogo</button>
+      </div>
+    </div>
+  </aside>
+
+  <button type="button" class="floating-btn toggle-sidebar-btn" id="toggle-btn" aria-controls="sidebar">☰ Menu</button>
+
+  <aside class="right-panel" id="right-panel" aria-label="Histórico de jogadas">
+    <div class="section-title">Histórico de Jogadas</div>
+    <div class="move-log" id="move-log">
+      <div class="empty-log">Clique em uma peça branca para iniciar a partida.</div>
+    </div>
+    <div class="help-tip">
+      🖱️ <b>Esquerdo:</b> selecionar / orbitar<br />
+      🖱️ <b>Scroll:</b> zoom • <b>Direito:</b> arrastar
+    </div>
+  </aside>
+
+  <button type="button" class="floating-btn toggle-history-btn" id="toggle-history-btn" aria-controls="right-panel">♜ Lances</button>
+
+  <noscript>Este jogo precisa de JavaScript habilitado.</noscript>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
